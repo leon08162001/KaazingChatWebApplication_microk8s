@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kaazingchatapi-website
+  namespace: kaazingchatapi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 200Mi
+  storageClassName: microk8s-hostpath
+  hostPath:
+    path: C:\\k8s\\volumes\\windows\\kaazingchatapi
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - windows
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kaazingchatapi-videostream
+  namespace: kaazingchatapi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 10Gi
+  storageClassName: microk8s-hostpath
+  hostPath:
+    path: C:\\k8s\\volumes\\windows\\data\\videostream
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - windows
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kaazingchatapi-faillog
+  namespace: kaazingchatapi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 100Mi
+  storageClassName: microk8s-hostpath
+  hostPath:
+    path: C:\\k8s\\volumes\\windows\\kaazingchatapi\\iis\\FailedReqLogFiles
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - windows
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kaazingchatapi-iislog
+  namespace: kaazingchatapi
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 100Mi
+  storageClassName: microk8s-hostpath
+  hostPath:
+    path: C:\\k8s\\volumes\\windows\\kaazingchatapi\\iis\\LogFiles
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+                - windows

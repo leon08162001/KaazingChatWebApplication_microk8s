@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose --file D:\Docker\pihole\docker-compose.yml convert
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: pihole
+  name: pihole
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.134.205
+  #externalIPs:
+  #- 192.168.134.114
+  ports:
+    - name: "53"
+      port: 53
+      targetPort: 53
+    - name: 53-udp
+      port: 53
+      protocol: UDP
+      targetPort: 53
+    - name: "18080"
+      port: 18080
+      targetPort: 80
+    - name: "9443"
+      port: 9443
+      targetPort: 443
+  selector:
+    io.kompose.service: pihole

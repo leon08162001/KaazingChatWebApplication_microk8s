@@ -1,0 +1,82 @@
+docker save pihole/pihole:2025.02.6 -o "E:\shared\DockerSave\pihole.tar"
+
+docker export pihole -o "E:\shared\DockerSave\pihole.tar"
+
+kompose --file D:\Docker\pihole\docker-compose.yml convert
+
+microk8s ctr images ls
+
+ctr -n=asuscomm.com images ls
+
+microk8s images import /shared/DockerSave/pihole.tar
+
+microk8s images remove docker.io/pihole/pihole:2025.02.6
+
+microk8s ctr -namespace="k8s.io" images ls
+
+microk8s ctr -namespace="asuscomm.com" image rm docker.io/pihole/pihole:2025.02.6
+
+microk8s ctr image import /shared/DockerSave/pihole.tar --platform=linux/amd64
+
+ctr -n k8s.io images list
+
+microk8s images import < nginx.tar
+
+multipass mount --type=classic E:\shared microk8s-vm:/shared
+
+multipass mount --type=classic E:\shared node1:/shared
+
+multipass mount --type=classic E:\shared node2:/shared
+
+multipass exec microk8s-vm -- sudo ctr -n="asuscomm.com" image import /shared/DockerSave/pihole.tar --platform=linux/amd64
+
+multipass exec node1 -- sudo ctr -n="asuscomm.com" image import /shared/DockerSave/pihole.tar --platform=linux/amd64
+
+multipass exec node2 -- sudo ctr -n="asuscomm.com" image import /shared/DockerSave/pihole.tar --platform=linux/amd64
+
+multipass exec ${nodename} -- sudo ctr -n="${namespace}" image import {@tarposition} --platform=linux/amd64
+
+ctr -n="asuscomm.com" image rm docker.io/pihole/pihole:2025.02.6
+
+kubectl apply -f "D:\KaazingChatWebApplication_DockerCompose\linux\Kompose convert\sqlserver-deployment.yaml"
+
+#改變上游之dns解析
+kubectl -n kube-system edit configmap coredns
+
+#進入pod內執行指令
+kubectl exec -it pihole-7fffc64644-snn76 -- /bin/sh
+
+kubectl exec -it -n pihole pihole-84bcc846c-wqldv -c pihole -- /bin/sh
+
+kubectl exec -it kaazingchatapi-deployment-69ccf4579c-zk7lw -c kaazingchatapi -- powershell
+
+#檢查pod錯誤
+kubectl describe pod sqlserver-6c4597c7b9-z482k
+
+#強制刪除pod
+kubectl delete pod <pod-name> -n <namespace> --grace-period=0 --force
+
+#切換到指定命名空間
+kubectl config set-context --current --namespace=home
+
+#传输文件
+multipass transfer "D:\Kompose convert\kaazing-websocket\gateway-config.xml" microk8s-vm:/kaazing-gateway/conf/gateway-config.xml
+
+#檢查該命名空間的事件log追查錯誤
+kubectl get events -n kaazing-gateway --sort-by='.lastTimestamp'
+
+#傳遞資料在來源,目的之間
+multipass transfer "D:\Kompose convert\transfer\xxx" microk8s-vm:/var/snap/microk8s/current/certs/ca.crt
+multipass transfer microk8s-vm:/var/snap/microk8s/current/certs/ca.crt "D:\Kompose convert\transfer\certs\ca.crt"
+
+#取得所有服務並依external ip排序
+kubectl get svc -o wide --all-namespaces --sort-by='.status.loadBalancer.ingress[0].ip'
+
+#檢查沒有 Endpoint 的 Service
+kubectl get endpoints --all-namespaces | Select-String "<none>"
+
+#取得所有pods並依namespace 排序
+kubectl get pods -o wide --all-namespaces --sort-by=.metadata.namespace
+
+#顯示所有狀態異常的 Pods
+kubectl get pods --all-namespaces --field-selector=status.phase!=Running,status.phase!=Succeeded

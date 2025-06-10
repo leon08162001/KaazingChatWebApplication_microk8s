@@ -1,0 +1,38 @@
+#利用 Multipass 在區域網路架設一套 MicroK8s 叢集環境
+https://blog.miniasp.com/post/2022/01/15/Build-your-own-MicroK8s-with-Multipass-with-Fixed-IP
+
+#如何替 Multipass 建立的 VM 設定一組固定 IP 地址
+https://blog.miniasp.com/post/2022/01/13/Creating-a-Fixed-IP-address-for-Multipass-VM
+
+#使用 MicroK8s 架設 Kubernetes 叢集的完整過程解析
+https://blog.miniasp.com/post/2021/12/05/Running-Kubernetes-with-MicroK8s
+
+#設定 Microk8s 為固定IP，解決重開機 Hyper-V IP 浮動問題
+https://ithelp.ithome.com.tw/articles/10283724
+
+#Selecting a snap channel(指定安裝版本)
+https://microk8s.io/docs/setting-snap-channel
+
+#安裝 MicroK8s Kubernetes 平臺
+https://labs.etsi.org/rep/tfs/controller/-/blob/61fe4bec72fe54fee5509b57c79e0bc3a8f1435c/tutorial/1-2-install-microk8s.md
+
+#Ubuntu 安裝 Docker CE
+https://medium.com/@jason.ho/ubuntu-%E5%AE%89%E8%A3%9D-docker-ce-fa9e7f3937b9
+
+#How to install cri-dockerd and migrate nodes from dockershim
+https://www.mirantis.com/blog/how-to-install-cri-dockerd-and-migrate-nodes-from-dockershim/
+
+#配置 Docker 的 cgroup driver 为 systemd
+https://zhuanlan.zhihu.com/p/633832183
+
+#Ubuntu Default Root Password (Default Ubuntu Password Explained)
+https://host-world.com/ubuntu-default-root-password-default-ubuntu-password-explained
+
+#To install the latest version, run:
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+#向 MicroK8s 添加 Windows 工作節點
+https://microk8s.io/docs/add-a-windows-worker-node-to-microk8s
+
+#使用 StatefulSets 在 Kubernetes 上部署 SQL Server Linux 容器
+https://learn.microsoft.com/zh-tw/sql/linux/sql-server-linux-kubernetes-best-practices-statefulsets?view=sql-server-ver16

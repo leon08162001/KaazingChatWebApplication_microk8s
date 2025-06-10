@@ -1,0 +1,40 @@
+安裝 MicroK8s 工具
+
+安裝好之後你會有一個 C:\Program Files\MicroK8s\microk8s.exe 執行檔可用。
+
+安裝 Multipass 工具
+
+安裝好之後你會有一個 C:\Program Files\Multipass\bin\multipass.exe 執行檔可用。
+
+安裝 Helm 工具
+第一次使用 helm 的話，可能要先新增常用的 Helm Repo
+helm repo add bitnami https://charts.bitnami.com/bitnami --force-update
+
+
+#install microk8s snap manually
+multipass exec microk8s-vm -- sudo snap install microk8s --classic
+
+#檢查 MicroK8s 叢集狀態
+microk8s status --wait-ready
+
+#改用 microk8s-vm.mshome.net 做為預設的伺服器位址
+microk8s kubectl config set-cluster microk8s-cluster --server=https://microk8s-vm.mshome.net:16443
+
+#設定連線到 MicroK8s 的憑證 (KUBECONFIG)
+cd XXX
+mkdir .kube
+cd .kube
+microk8s config > config
+
+#建立兩台全新的 Ubuntu VM：node1, node2
+multipass launch --name node1
+multipass launch --name node2
+
+#mount 掛載host文件夾到VM
+multipass mount E:\shared microk8s-vm:/shared
+
+#檢查節點上的污點設定
+microk8s kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints --no-headers
+
+#在節點上設立污點
+microk8s kubectl taint nodes win-node1 os=windows:NoSchedule
