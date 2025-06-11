@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>K8s 系統架構圖</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f8f9fa;
+      color: #212529;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    h2 {
+      color: #0d6efd;
+    }
+    pre {
+      background-color: #e9ecef;
+      padding: 16px;
+      overflow-x: auto;
+      border-radius: 8px;
+      font-family: "Courier New", monospace;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>🌐 K8s 系統架構圖（文字版）</h2>
+  <pre>
+                         ┌────────────────────────┐
+                         │      外部使用者        │
+                         └──────────┬─────────────┘
+                                    │
+                          [MetalLB LoadBalancer]
+                                    │
+                    ┌──────────────▼──────────────┐
+                    │ 前台：聊天室網站服務 (3 Pods) │
+                    │    [Service: LoadBalancer]   │
+                    └───────┬─────────────┬────────┘
+                            │             │
+              ┌────────────▼──┐      ┌────▼────────────┐
+              │ Kaazing WS GW │◄────►│ .NET Core API   │
+              │   (2 Pods)    │      │   (2 Pods)      │
+              │ [Service: LB] │      │ [Service: LB]   │
+              └──────┬────────┘      └───────┬─────────┘
+                     │                        │
+           ┌─────────▼──────┐         ┌───────▼────────────┐
+           │ TIBCO EMS 後台 │         │   SQL Server DB     │
+           │     (外部或Pod) │         │    (外部或Pod)      │
+           └────────────────┘         └─────────────────────┘
+  </pre>
+
+  <div class="section">
+    <h2>📌 架構說明</h2>
+    <ul>
+      <li><strong>前台聊天室網站服務（3 Pods）</strong>
+        <ul>
+          <li>透過 MetalLB 提供 LoadBalancer Service。</li>
+          <li>使用 Kaazing WebSocket Gateway 建立即時通訊連線。</li>
+          <li>與 .NET Core API 通訊以取得/儲存聊天訊息與用戶資料。</li>
+        </ul>
+      </li>
+      <li><strong>Kaazing WebSocket Gateway（2 Pods）</strong>
+        <ul>
+          <li>提供 WebSocket 通訊橋接功能。</li>
+          <li>與前台聊天室網站和 .NET Core API 通訊。</li>
+          <li>串接後端的 TIBCO EMS 消息伺服器。</li>
+        </ul>
+      </li>
+      <li><strong>.NET Core API（2 Pods）</strong>
+        <ul>
+          <li>提供 RESTful API 與前台網站互動。</li>
+          <li>使用 Kaazing WebSocket Gateway 與其他系統交換訊息。</li>
+          <li>存取 SQL Server 資料庫服務以處理資料存取。</li>
+        </ul>
+      </li>
+      <li><strong>TIBCO EMS</strong>
+        <ul>
+          <li>作為企業級訊息中介。</li>
+          <li>供 Kaazing WebSocket Gateway 使用。</li>
+          <li>可部署為 K8s Pod 或外部服務。</li>
+        </ul>
+      </li>
+      <li><strong>SQL Server</strong>
+        <ul>
+          <li>提供資料儲存，供 .NET Core API 使用。</li>
+          <li>可為 K8s Pod 或外部資料庫。</li>
+        </ul>
+      </li>
+      <li><strong>Pi-hole</strong>
+        <ul>
+          <li>作為整個系統內部 DNS 主伺服器。</li>
+          <li>可部署為 Pod，並為所有服務解析名稱。</li>
+        </ul>
+      </li>
+      <li><strong>MetalLB</strong>
+        <ul>
+          <li>在 MicroK8s 中提供 LoadBalancer 功能，讓外部可透過固定 IP 存取服務。</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</body>
+</html>
