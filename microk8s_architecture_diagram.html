@@ -37,13 +37,13 @@
   <h2>🌐 K8s 系統架構圖（文字版）</h2>
   <pre>
                          ┌────────────────────────┐
-                         │      外部使用者        │
+                         │      外部使用者          │
                          └──────────┬─────────────┘
                                     │
                           [MetalLB LoadBalancer]
                                     │
-                    ┌──────────────▼──────────────┐
-                    │ 前台：聊天室網站服務 (3 Pods) │
+                    ┌──────────────▼───────────────┐
+                    │ 前台：聊天室網站服務 (3 Pods)   │
                     │    [Service: LoadBalancer]   │
                     └───────┬─────────────┬────────┘
                             │             │
@@ -54,9 +54,9 @@
               └──────┬────────┘      └───────┬─────────┘
                      │                        │
            ┌─────────▼──────┐         ┌───────▼────────────┐
-           │ TIBCO EMS 後台 │         │   SQL Server DB     │
+           │ TIBCO EMS 後台  │         │    SQL Server DB   │
            │     (外部或Pod) │         │    (外部或Pod)      │
-           └────────────────┘         └─────────────────────┘
+           └────────────────┘         └────────────────────┘
   </pre>
 
   <div class="section">
@@ -83,20 +83,20 @@
           <li>存取 SQL Server 資料庫服務以處理資料存取。</li>
         </ul>
       </li>
-      <li><strong>TIBCO EMS</strong>
+      <li><strong>TIBCO EMS（1 Pods）</strong>
         <ul>
           <li>作為企業級訊息中介。</li>
           <li>供 Kaazing WebSocket Gateway 使用。</li>
           <li>可部署為 K8s Pod 或外部服務。</li>
         </ul>
       </li>
-      <li><strong>SQL Server</strong>
+      <li><strong>SQL Server（1 Pods）</strong>
         <ul>
           <li>提供資料儲存，供 .NET Core API 使用。</li>
           <li>可為 K8s Pod 或外部資料庫。</li>
         </ul>
       </li>
-      <li><strong>Pi-hole</strong>
+      <li><strong>Pi-hole（1 Pods）</strong>
         <ul>
           <li>作為整個系統內部 DNS 主伺服器。</li>
           <li>可部署為 Pod，並為所有服務解析名稱。</li>
