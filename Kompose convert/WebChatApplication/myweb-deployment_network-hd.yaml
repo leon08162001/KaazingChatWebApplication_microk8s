@@ -9,7 +9,7 @@ metadata:
   name: myweb-deployment
   namespace: myweb
 spec:
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       io.kompose.service: myweb
@@ -23,14 +23,17 @@ spec:
     spec:
       volumes:
         - name: kaazingchatwebapplication-myweb
-          persistentVolumeClaim:
-            claimName: kaazingchatwebapplication-myweb
+          hostPath:
+            path: "Z:\\volumes\\windows\\KaazingChatWebApplication"
+            type: Directory
         - name: pushnotificationwebap-myweb
-          persistentVolumeClaim:
-            claimName: pushnotificationwebap-myweb
+          hostPath:
+            path: "Z:\\volumes\\windows\\PushNotificationWebAp"
+            type: Directory
         - name: taipeistarbankmessageclientwebapi-myweb
-          persistentVolumeClaim:
-            claimName: taipeistarbankmessageclientwebapi-myweb
+          hostPath:
+            path: "Z:\\volumes\\windows\\TaipeiStarBankMessageClientWebApi"
+            type: Directory
       dnsPolicy: "None"
       dnsConfig:
         nameservers:

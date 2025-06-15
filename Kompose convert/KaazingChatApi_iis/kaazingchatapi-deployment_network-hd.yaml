@@ -24,17 +24,21 @@ spec:
     spec:
       volumes:
         - name: kaazingchatapi-website
-          persistentVolumeClaim:
-            claimName: kaazingchatapi-website
+          hostPath:
+            path: "Z:/volumes/windows/KaazingChatApi"
+            type: Directory
         - name: kaazingchatapi-videostream
-          persistentVolumeClaim:
-            claimName: kaazingchatapi-videostream
+          hostPath:
+            path: "Z:/volumes/windows/data/videostream"
+            type: Directory
         - name: kaazingchatapi-faillog
-          persistentVolumeClaim:
-            claimName: kaazingchatapi-faillog
+          hostPath:
+            path: "Z:/volumes/windows/KaazingChatApi/iis/FailedReqLogFiles"
+            type: Directory
         - name: kaazingchatapi-iislog
-          persistentVolumeClaim:
-            claimName: kaazingchatapi-iislog
+          hostPath:
+            path: "Z:/volumes/windows/KaazingChatApi/iis/LogFiles"
+            type: Directory
       dnsPolicy: "None"
       dnsConfig:
         nameservers:
