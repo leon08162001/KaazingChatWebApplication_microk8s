@@ -1,0 +1,17 @@
+docker build -t myweb .
+
+docker run --name=chatwebapplication --restart=always --isolation=hyperv -d -p 80:80 -p 1443:1443 myweb
+
+docker run --name=myweb -v F:\KaazingChatWebApplication_DockerCompose\windows\log_files\KaazingChatWebApplication:C:\inetpub\wwwroot\KaazingChatWebApplication\log_files -v F:\KaazingChatWebApplication_DockerCompose\windows\log_files\TaipeiStarBankMessageClientWebApi:C:\inetpub\wwwroot\TaipeiStarBankMessageClientWebApi\log_files --restart=always --isolation=hyperv -d -p 1443:1443 myweb
+
+docker network create -d nat --subnet=172.16.238.0/24 --gateway=172.16.238.1 web_network
+
+docker run --net web_network --ip 172.16.238.10 --name=myweb --restart=always --isolation=hyperv -d -p 80:80 -p 1443:1443 myweb:latest
+
+docker run -v D:\KaazingChatWebApplication_DockerCompose\windows\WebChatApplication\data\:C:\inetpub\wwwroot\ --net web_network --ip 172.16.238.10 --name=myweb --restart=always --isolation=hyperv -d -p 80:80 -p 1443:1443 myweb:latest
+
+docker run -v D:\KaazingChatWebApplication_DockerCompose\windows\WebChatApplication\data\:C:\inetpub\wwwroot\ --net web_network --ip 172.16.238.10 --name=myweb --isolation=hyperv -d -p 180:80 -p 1443:1443 myweb:latest
+
+docker run -v D:\KaazingChatWebApplication_DockerCompose\windows\WebChatApplication\data\:C:\inetpub\wwwroot\ --net web_network --ip 172.16.238.30 --name=myweb1 --isolation=hyperv -d -p 280:80 -p 2443:1443 myweb:latest
+
+docker run -v D:\KaazingChatWebApplication_DockerCompose\windows\WebChatApplication\data\:C:\inetpub\wwwroot\ --net web_network --ip 172.16.238.40 --name=myweb2 --isolation=hyperv -d -p 380:80 -p 3443:1443 myweb:latest

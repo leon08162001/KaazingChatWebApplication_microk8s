@@ -1,0 +1,12 @@
+docker build -t kaazingchatapi:latest .
+
+docker run --name=kaazingchatapi --restart=always --isolation=hyperv -d -p 8080:8080 -p 8081:8081 kaazingchatapi:latest
+
+docker run --name=kaazingchatapi -v F:\KaazingChatWebApplication_DockerCompose\windows\log_files\KaazingChatApi:C:\inetpub\wwwroot\KaazingChatApi\log_files --restart=always --isolation=hyperv -d -p 8080:8080 -p 8081:8081 kaazingchatapi:latest
+
+docker network create -d nat --subnet=172.16.238.0/24 --gateway=172.16.238.1 web_network
+
+docker run --net web_network --ip 172.16.238.20 --name=kaazingchatapi --restart=always -v D:\VideoStream\:C:\VideoStream\ --isolation=hyperv -d -p 8080:8080 -p 8081:8081 kaazingchatapi:latest
+
+docker run --net web_network --ip 172.16.238.20 --name=kaazingchatapi -v D:\KaazingChatWebApplication_DockerCompose\windows\KaazingChatApi_iis\data\:C:\inetpub\wwwroot\ -v D:\VideoStream\:C:\VideoStream\ --isolation=hyperv -d -p 8080:8080 -p 8081:8081 kaazingchatapi:latest
+

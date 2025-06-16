@@ -1,0 +1,57 @@
+# escape=`
+ARG REPO=mcr.microsoft.com/dotnet/framework/aspnet
+FROM $REPO:4.8-20240213-windowsservercore-ltsc2019
+
+ENV hostname "leonnote.asuscomm.com"
+ENV pfxpw "880816"
+
+WORKDIR /inetpub/wwwroot
+#RUN mkdir -p C:\inetpub\wwwroot\KaazingChatWebApplication
+
+COPY certs/wildcard.asuscomm.com.pfx /wildcard.asuscomm.com.pfx
+COPY certs/ca.cer /ca.cer
+COPY certs/Intermediate.cer /Intermediate.cer
+COPY certs/wildcard.asuscomm.com.cer /wildcard.asuscomm.com.cer
+
+
+#ADD KaazingChatWebApplication C:\inetpub\wwwroot\KaazingChatWebApplication
+ADD release C:\inetpub\wwwroot\KaazingChatWebApplication
+ADD TaipeiStarBankMessageClientWebApi C:\inetpub\wwwroot\TaipeiStarBankMessageClientWebApi
+ADD PushNotificationWebAp C:\inetpub\wwwroot\PushNotificationWebAp
+#COPY etc/hosts C:\Windows\System32\drivers\etc\hosts
+
+
+SHELL [ "powershell" ]
+
+#RUN Add-WindowsFeature telnet-client;
+
+#setup Remote IIS management
+RUN Install-WindowsFeature Web-Mgmt-Service; `
+New-ItemProperty -Path HKLM:\software\microsoft\WebManagement\Server -Name EnableRemoteManagement -Value 1 -Force; `
+Set-Service -Name wmsvc -StartupType automatic;
+
+#Add user for Remote IIS Manager Login
+RUN net user iisadmin 1qaz!QAZ /ADD; `
+net localgroup administrators iisadmin /add;
+
+RUN Import-Module IISAdministration; `
+    $PfxPW = ConvertTo-SecureString -String \"${env:pfxpw}\" -Force -AsPlainText; `
+    Import-Certificate -FilePath C:\ca.cer -CertStoreLocation cert:\LocalMachine\Root; `
+    Import-Certificate -FilePath C:\Intermediate.cer -CertStoreLocation cert:\LocalMachine\CA; `
+    $cert = Import-PfxCertificate -FilePath C:\wildcard.asuscomm.com.pfx -CertStoreLocation cert:\LocalMachine\My -Password $PfxPW; `
+    Remove-Item C:\ca.cer; `
+    Remove-Item C:\Intermediate.cer; `
+    Remove-Item C:\wildcard.asuscomm.com.pfx; `
+    $newAppPool = New-WebAppPool -Name "KaazingChatWebApplication" -Force; `
+    $newAppPool = New-WebAppPool -Name "TaipeiStarBankMessageClientWebApi" -Force; `
+    $newAppPool = New-WebAppPool -Name "PushNotificationWebAp" -Force; `
+    New-IISSiteBinding -Name \"Default Web Site\" -Protocol https -BindingInformation \"*:1443:${env:hostname}\" -SslFlag Sni -CertificateThumbPrint $cert.Thumbprint -CertStoreLocation "cert:\LocalMachine\My"; `
+    New-IISSiteBinding -Name \"Default Web Site\" -Protocol http -BindingInformation "192.168.252.127:80:"; `
+    New-IISSiteBinding -Name \"Default Web Site\" -Protocol http -BindingInformation "127.0.0.1:80:"; `
+    New-IISSiteBinding -Name \"Default Web Site\" -Protocol http -BindingInformation "*:80:localhost"; `
+    New-WebApplication -Name "KaazingChatWebApplication" -Site \"Default Web Site\" -PhysicalPath "C:\inetpub\wwwroot\KaazingChatWebApplication" -ApplicationPool "KaazingChatWebApplication" -Force; `
+    New-WebApplication -Name "TaipeiStarBankMessageClientWebApi" -Site \"Default Web Site\" -PhysicalPath "C:\inetpub\wwwroot\TaipeiStarBankMessageClientWebApi" -ApplicationPool "TaipeiStarBankMessageClientWebApi" -Force; `
+    New-WebApplication -Name "PushNotificationWebAp" -Site \"Default Web Site\" -PhysicalPath "C:\inetpub\wwwroot\PushNotificationWebAp" -ApplicationPool "PushNotificationWebAp" -Force;    
+
+EXPOSE 80
+EXPOSE 1443

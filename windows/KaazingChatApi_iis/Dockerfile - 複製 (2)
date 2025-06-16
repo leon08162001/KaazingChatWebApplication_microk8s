@@ -1,0 +1,50 @@
+# escape=`
+ARG REPO=mcr.microsoft.com/dotnet/framework/aspnet
+FROM $REPO:4.8-20240213-windowsservercore-ltsc2019
+
+ENV hostname "leonnote.asuscomm.com"
+ENV pfxpw "880816"
+
+WORKDIR /inetpub/wwwroot
+#RUN mkdir -p C:\inetpub\wwwroot\KaazingChatWebApplication
+
+COPY certs/wildcard.asuscomm.com.pfx /wildcard.asuscomm.com.pfx
+COPY certs/ca.cer /ca.cer
+COPY certs/Intermediate.cer /Intermediate.cer
+
+ADD install/dotnet-hosting-8.0.5-win.exe C:\install\dotnet-hosting-8.0.5-win.exe
+ADD install/ServiceMonitor.exe C:\ServiceMonitor.exe
+ADD KaazingChatApi C:\inetpub\wwwroot\KaazingChatApi
+#COPY etc/hosts C:\Windows\System32\drivers\etc\hosts
+
+SHELL [ "powershell" ]
+
+RUN Add-WindowsFeature Web-Server; `
+    Add-WindowsFeature NET-Framework-45-ASPNET; `
+    Add-WindowsFeature Web-Asp-Net45;
+#    Invoke-WebRequest -Uri 'https://dotnetbinaries.blob.core.windows.net/servicemonitor/2.0.1.10/ServiceMonitor.exe' -OutFile C:\ServiceMonitor.exe;
+    
+RUN C:\install\dotnet-hosting-8.0.16-win.exe /install /quiet
+
+ 
+RUN Import-Module IISAdministration; `
+    $PfxPW = ConvertTo-SecureString -String \"${env:pfxpw}\" -Force -AsPlainText; `
+    Import-Certificate -FilePath C:\ca.cer -CertStoreLocation cert:\LocalMachine\Root; `
+    Import-Certificate -FilePath C:\Intermediate.cer -CertStoreLocation cert:\LocalMachine\CA; `
+    $cert = Import-PfxCertificate -FilePath C:\wildcard.asuscomm.com.pfx -CertStoreLocation cert:\LocalMachine\My -Password $PfxPW; `
+    Remove-Item C:\ca.cer; `
+    Remove-Item C:\Intermediate.cer; `
+    Remove-Item C:\wildcard.asuscomm.com.pfx; `
+    $newAppPool = New-WebAppPool -Name "KaazingChatApi" -Force; `
+    $newAppPool.managedRuntimeVersion = \"\"; `
+    $newAppPool | Set-Item; `
+    New-IISSite -Name "KaazingChatWebApi" -BindingInformation "*:8080:" -PhysicalPath "C:\inetpub\wwwroot\KaazingChatApi" -Force; `
+    New-IISSiteBinding -Name \"KaazingChatWebApi\" -Protocol https -BindingInformation \"*:8081:${env:hostname}\" -SslFlag Sni -CertificateThumbPrint $cert.Thumbprint -CertStoreLocation "cert:\LocalMachine\My"; `
+    New-IISSiteBinding -Name \"KaazingChatWebApi\" -Protocol http -BindingInformation "192.168.252.127:8080:"; `
+    New-IISSiteBinding -Name \"KaazingChatWebApi\" -Protocol http -BindingInformation "127.0.0.1:8080:"; `
+    New-IISSiteBinding -Name \"KaazingChatWebApi\" -Protocol http -BindingInformation "*:8080:localhost";
+
+EXPOSE 8080
+EXPOSE 8081
+
+ENTRYPOINT ["C:\\ServiceMonitor.exe", "w3svc"]
