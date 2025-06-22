@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    svc: sqlserver-internal-service
+  name: sqlserver-internal-service
+  namespace: sqlserver
+spec:
+  type: ClusterIP
+  ports:
+    - name: sqlserver-tcp
+      port: 2433
+      protocol: TCP
+      targetPort: 1433
+  selector:
+    app: sqlserver
+  sessionAffinity: None

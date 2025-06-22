@@ -1,0 +1,90 @@
+{
+  "id": null,
+  "title": "Linkerd TCP Metrics by Namespace",
+  "timezone": "browser",
+  "panels": [
+    {
+      "type": "stat",
+      "title": "mTLS Ratio (All Namespaces)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(linkerd_tls_accepts_total) / (sum(linkerd_tls_accepts_total) + sum(linkerd_tls_no_identity_total)) * 100",
+          "format": "time_series"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 80 },
+              { "color": "green", "value": 95 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center"
+      }
+    },
+    {
+      "type": "graph",
+      "title": "Inbound TCP Connections by Namespace",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(linkerd_tcp_open_connections{direction=\"inbound\"}) by (namespace)",
+          "legendFormat": "{{namespace}}"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 6 }
+    },
+    {
+      "type": "graph",
+      "title": "Outbound TCP Connections by Namespace",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(linkerd_tcp_open_connections{direction=\"outbound\"}) by (namespace)",
+          "legendFormat": "{{namespace}}"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 10, "w": 12, "h": 6 }
+    },
+    {
+      "type": "graph",
+      "title": "TCP Read Bytes/sec (rate)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(linkerd_tcp_read_bytes_total[1m])) by (namespace)",
+          "legendFormat": "{{namespace}}"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 6 }
+    },
+    {
+      "type": "graph",
+      "title": "TCP Write Bytes/sec (rate)",
+      "datasource": "Prometheus",
+      "targets": [
+        {
+          "expr": "sum(rate(linkerd_tcp_write_bytes_total[1m])) by (namespace)",
+          "legendFormat": "{{namespace}}"
+        }
+      ],
+      "gridPos": { "x": 0, "y": 22, "w": 12, "h": 6 }
+    }
+  ],
+  "schemaVersion": 30,
+  "version": 1,
+  "refresh": "10s"
+}

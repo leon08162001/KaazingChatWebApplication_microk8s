@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sqlserver-gatewaypod
+  name: sqlserver-gatewaypod-deployment
+  namespace: sqlserver
+  annotations:
+    linkerd.io/inject: enabled
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlserver-gatewaypod
+  template:
+    metadata:
+      labels:
+        app: sqlserver-gatewaypod
+    spec:
+      containers:
+        - name: socat
+          image: alpine/socat
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              socat TCP-LISTEN:2433,fork,reuseaddr TCP:sqlserver-internal-service.sqlserver.svc.cluster.local:2433 &
+              tail -f /dev/null
+          ports:
+            - containerPort: 2433
+              protocol: TCP

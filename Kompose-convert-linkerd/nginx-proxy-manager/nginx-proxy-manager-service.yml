@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose --file D:\Docker\Nginx Proxy Manager\docker-compose.yml convert
+    kompose.version: 1.36.0 (ae2a39403)
+    metallb.universe.tf/allow-shared-ip: npm-svc
+  labels:
+    io.kompose.service: nginx-proxy-manager
+  name: nginx-proxy
+  namespace: npm-ori
+spec:
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+  loadBalancerIP: 192.168.134.203
+  ports:
+    - name: "80"
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: "443"
+      port: 443
+      protocol: TCP
+      targetPort: 443
+    - name: "853"
+      port: 853
+      protocol: TCP
+      targetPort: 853
+  selector:
+    io.kompose.service: nginx-proxy-manager
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose --file D:\Docker\Nginx Proxy Manager\docker-compose.yml convert
+    kompose.version: 1.36.0 (ae2a39403)
+    metallb.universe.tf/allow-shared-ip: npm-svc
+  labels:
+    io.kompose.service: nginx-proxy-manager
+  name: nginx-proxy-manager
+  namespace: npm-ori
+spec:
+  externalTrafficPolicy: Local
+  type: LoadBalancer
+  loadBalancerIP: 192.168.134.203
+  ports:
+    - name: "81"
+      port: 81
+      protocol: TCP
+      targetPort: 81
+  selector:
+    io.kompose.service: nginx-proxy-manager
+
+
+

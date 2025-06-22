@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Windows\system32\kompose.exe convert -f docker-compose.yml
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    app: myweb
+  name: myweb-deployment
+  namespace: myweb
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: myweb
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Windows\system32\kompose.exe convert -f docker-compose.yml
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        app: myweb
+    spec:
+      volumes:
+        - name: kaazingchatwebapplication-myweb
+          persistentVolumeClaim:
+            claimName: kaazingchatwebapplication-myweb
+        - name: pushnotificationwebap-myweb
+          persistentVolumeClaim:
+            claimName: pushnotificationwebap-myweb
+        - name: taipeistarbankmessageclientwebapi-myweb
+          persistentVolumeClaim:
+            claimName: taipeistarbankmessageclientwebapi-myweb
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - 192.168.134.205
+          - 1.1.1.1
+        searches:
+          - tibcoems.svc.cluster.local
+          - svc.cluster.local
+        options:
+          - name: ndots
+            value: "2"
+      containers:
+        - env:
+            - name: TZ
+              value: Asia/Taipei
+          image: myweb:latest
+          imagePullPolicy: Never
+          name: myweb
+          ports:
+            - containerPort: 80
+              protocol: TCP
+            - containerPort: 1443
+              protocol: TCP
+            - containerPort: 8172
+              protocol: TCP
+          volumeMounts:
+            - name: kaazingchatwebapplication-myweb
+              mountPath: "c:\\inetpub\\wwwroot\\KaazingChatWebApplication"
+            - name: pushnotificationwebap-myweb
+              mountPath: "c:\\inetpub\\wwwroot\\PushNotificationWebAp"
+            - name: taipeistarbankmessageclientwebapi-myweb
+              mountPath: "c:\\inetpub\\wwwroot\\TaipeiStarBankMessageClientWebApi"
+      restartPolicy: Always
+      tolerations:
+        - key: "os"
+          operator: "Equal"
+          value: "windows"
+          effect: "NoSchedule"
+      nodeSelector:
+        "kubernetes.io/os": windows

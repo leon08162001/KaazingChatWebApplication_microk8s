@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: tibcoems-gatewaypod
+  name: tibcoems-gatewaypod-deployment
+  namespace: tibcoems
+  annotations:
+    linkerd.io/inject: enabled
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tibcoems-gatewaypod
+  template:
+    metadata:
+      labels:
+        app: tibcoems-gatewaypod
+    spec:
+      containers:
+        - name: socat
+          image: alpine/socat
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              socat TCP-LISTEN:7222,fork,reuseaddr TCP:tibcoems-internal-service.tibcoems.svc.cluster.local:7222 &
+              socat TCP-LISTEN:7243,fork,reuseaddr TCP:tibcoems-internal-service.tibcoems.svc.cluster.local:7243 &
+              tail -f /dev/null
+          ports:
+            - containerPort: 7222
+              protocol: TCP
+            - containerPort: 7243
+              protocol: TCP

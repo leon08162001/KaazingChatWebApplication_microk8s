@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: linkerd-viz
+  uid: ac73a178-2c47-4eb1-8a35-79e8e736f0dc
+  resourceVersion: '513805'
+  generation: 1
+  creationTimestamp: '2025-06-20T12:41:54Z'
+  labels:
+    app.kubernetes.io/name: web
+    app.kubernetes.io/part-of: Linkerd
+    app.kubernetes.io/version: stable-2.14.3
+    component: web
+    linkerd.io/extension: viz
+    namespace: linkerd-viz
+  annotations:
+    config.linkerd.io/proxy-await: enabled
+    deployment.kubernetes.io/revision: '1'
+    kubectl.kubernetes.io/last-applied-configuration: >
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"config.linkerd.io/proxy-await":"enabled","linkerd.io/created-by":"linkerd/helm
+      stable-2.14.3","linkerd.io/inject":"enabled"},"labels":{"app.kubernetes.io/name":"web","app.kubernetes.io/part-of":"Linkerd","app.kubernetes.io/version":"stable-2.14.3","component":"web","linkerd.io/extension":"viz","namespace":"linkerd-viz"},"name":"web","namespace":"linkerd-viz"},"spec":{"replicas":1,"selector":{"matchLabels":{"component":"web","linkerd.io/extension":"viz","namespace":"linkerd-viz"}},"template":{"metadata":{"annotations":{"cluster-autoscaler.kubernetes.io/safe-to-evict":"true","config.alpha.linkerd.io/proxy-wait-before-exit-seconds":"0","linkerd.io/created-by":"linkerd/helm
+      stable-2.14.3","linkerd.io/inject":"enabled"},"labels":{"component":"web","linkerd.io/extension":"viz","namespace":"linkerd-viz"}},"spec":{"containers":[{"args":["-linkerd-metrics-api-addr=metrics-api.linkerd-viz.svc.cluster.local:8085","-cluster-domain=cluster.local","-controller-namespace=linkerd","-log-level=info","-log-format=plain","-enforced-host=^(localhost|127\\.0\\.0\\.1|web\\.linkerd-viz\\.svc\\.cluster\\.local|web\\.linkerd-viz\\.svc|\\[::1\\])(:\\d+)?$","-enable-pprof=false"],"image":"cr.l5d.io/linkerd/web:stable-2.14.3","imagePullPolicy":"IfNotPresent","livenessProbe":{"httpGet":{"path":"/ping","port":9994},"initialDelaySeconds":10},"name":"web","ports":[{"containerPort":8084,"name":"http"},{"containerPort":9994,"name":"admin-http"}],"readinessProbe":{"failureThreshold":7,"httpGet":{"path":"/ready","port":9994}},"resources":null,"securityContext":{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":2103,"seccompProfile":{"type":"RuntimeDefault"}}}],"nodeSelector":{"kubernetes.io/os":"linux"},"securityContext":{"seccompProfile":{"type":"RuntimeDefault"}},"serviceAccountName":"web"}}}}
+    linkerd.io/created-by: linkerd/helm stable-2.14.3
+    linkerd.io/inject: enabled
+  selfLink: /apis/apps/v1/namespaces/linkerd-viz/deployments/web
+status:
+  observedGeneration: 1
+  replicas: 1
+  updatedReplicas: 1
+  readyReplicas: 1
+  availableReplicas: 1
+  conditions:
+    - type: Progressing
+      status: 'True'
+      lastUpdateTime: '2025-06-20T12:43:21Z'
+      lastTransitionTime: '2025-06-20T12:41:55Z'
+      reason: NewReplicaSetAvailable
+      message: ReplicaSet "web-65b5bb96c8" has successfully progressed.
+    - type: Available
+      status: 'True'
+      lastUpdateTime: '2025-06-21T01:46:14Z'
+      lastTransitionTime: '2025-06-21T01:46:14Z'
+      reason: MinimumReplicasAvailable
+      message: Deployment has minimum availability.
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: web
+      linkerd.io/extension: viz
+      namespace: linkerd-viz
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        component: web
+        linkerd.io/extension: viz
+        namespace: linkerd-viz
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: 'true'
+        config.alpha.linkerd.io/proxy-wait-before-exit-seconds: '0'
+        linkerd.io/created-by: linkerd/helm stable-2.14.3
+        linkerd.io/inject: enabled
+    spec:
+      containers:
+        - name: web
+          image: cr.l5d.io/linkerd/web:stable-2.14.3
+          args:
+            - >-
+              -linkerd-metrics-api-addr=metrics-api.linkerd-viz.svc.cluster.local:8085
+            - '-cluster-domain=cluster.local'
+            - '-controller-namespace=linkerd'
+            - '-log-level=info'
+            - '-log-format=plain'
+            - >-
+              -enforced-host=.*
+            - '-enable-pprof=false'
+          ports:
+            - name: http
+              containerPort: 8084
+              protocol: TCP
+            - name: admin-http
+              containerPort: 9994
+              protocol: TCP
+          resources: {}
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 9994
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 9994
+              scheme: HTTP
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 7
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities:
+              drop:
+                - ALL
+            runAsUser: 2103
+            runAsNonRoot: true
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            seccompProfile:
+              type: RuntimeDefault
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: web
+      serviceAccount: web
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      schedulerName: default-scheduler
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600

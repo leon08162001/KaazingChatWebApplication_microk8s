@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Windows\system32\kompose.exe convert -f docker-compose.yml
+    kompose.version: 1.36.0 (ae2a39403)
+  labels:
+    io.kompose.service: kaazingchatapi
+  name: kaazingchatapi-deployment
+  namespace: kaazingchatapi
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      io.kompose.service: kaazingchatapi
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Windows\system32\kompose.exe convert -f docker-compose.yml
+        kompose.version: 1.36.0 (ae2a39403)
+        #experimental.windows.kubernetes.io/isolation-type: hyperv
+      labels:
+        io.kompose.service: kaazingchatapi
+    spec:
+      volumes:
+        - name: kaazingchatapi-website
+          hostPath:
+            path: "Z:/volumes/windows/KaazingChatApi"
+            type: Directory
+        - name: kaazingchatapi-videostream
+          hostPath:
+            path: "Z:/volumes/windows/data/videostream"
+            type: Directory
+        - name: kaazingchatapi-faillog
+          hostPath:
+            path: "Z:/volumes/windows/KaazingChatApi/iis/FailedReqLogFiles"
+            type: Directory
+        - name: kaazingchatapi-iislog
+          hostPath:
+            path: "Z:/volumes/windows/KaazingChatApi/iis/LogFiles"
+            type: Directory
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - 192.168.134.205
+          - 1.1.1.1
+        searches:
+          - tibcoems.svc.cluster.local
+          - svc.cluster.local
+        options:
+          - name: ndots
+            value: "2"
+      containers:
+        - env:
+            - name: TZ
+              value: Asia/Taipei
+          image: kaazingchatapi:latest
+          imagePullPolicy: Never
+          name: kaazingchatapi
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8081
+              protocol: TCP
+            - containerPort: 8172
+              protocol: TCP
+          volumeMounts:
+            - name: kaazingchatapi-website
+              mountPath: "c:\\inetpub\\wwwroot\\KaazingChatApi"
+            - name: kaazingchatapi-videostream
+              mountPath: "c:\\videostream"
+            - name: kaazingchatapi-faillog
+              mountPath: "c:\\inetpub\\logs\\FailedReqLogFiles"
+            - name: kaazingchatapi-iislog
+              mountPath: "c:\\inetpub\\logs\\LogFiles"
+      restartPolicy: Always
+      tolerations:
+        - key: "os"
+          operator: "Equal"
+          value: "windows"
+          effect: "NoSchedule"
+      nodeSelector:
+        "kubernetes.io/os": windows
