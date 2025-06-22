@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Windows\system32\kompose.exe --file D:\KaazingChatWebApplication_DockerCompose\linux\Kaazing Websocket_cluster1\docker-compose.yml convert
+    kompose.version: 1.36.0 (ae2a39403)
+    linkerd.io/inject: enabled
+  labels:
+    io.kompose.service: kaazing-gateway
+  name: kaazing-gateway
+  namespace: kaazingwebsocket
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      io.kompose.service: kaazing-gateway
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Windows\system32\kompose.exe --file D:\KaazingChatWebApplication_DockerCompose\linux\Kaazing Websocket_cluster1\docker-compose.yml convert
+        kompose.version: 1.36.0 (ae2a39403)
+      labels:
+        io.kompose.service: kaazing-gateway
+    spec:
+      volumes:
+        - name: shared-data
+          emptyDir: {}
+        - name: kaazing-config
+          persistentVolumeClaim:
+            claimName: kaazing-config
+        - name: kaazing-log
+          persistentVolumeClaim:
+            claimName: kaazing-log
+        - name: kaazing-certs
+          persistentVolumeClaim:
+            claimName: kaazing-certs
+      #dnsPolicy: ClusterFirstWithHostNet
+      dnsPolicy: "None"
+      dnsConfig:
+        nameservers:
+          - 192.168.134.205
+          - 1.1.1.1
+        searches:
+          - tibcoems.svc.cluster.local
+          - svc.cluster.local
+        options:
+          - name: ndots
+            value: "2"
+      initContainers:
+        - name: init-hosts
+          image: bitnami/kubectl
+          command:
+            - sh
+            - -c
+            - |
+              POD_IP=$(hostname -i)
+              echo "$POD_IP websocketserver1.asuscomm.com" > /data/extra-hosts
+              TARGET_POD_IP=$(kubectl get pods -n tibcoems -l io.kompose.service=tibcoems -o jsonpath='{.items[0].status.podIP}')
+              TARGET_POD_NAME=$(kubectl get pods -n tibcoems -l io.kompose.service=tibcoems -o jsonpath='{.items[0].metadata.name}')
+              echo "$TARGET_POD_IP $TARGET_POD_NAME" > /data/extra-hosts1
+          volumeMounts:
+            - name: shared-data
+              mountPath: /data
+      containers:
+        - env:
+            - name: TZ
+              value: Asia/Taipei
+          image: kaazing/gateway:5.8.22_cluster1
+          imagePullPolicy: Never
+          name: kaazingwebsocket
+          command:
+            - sh
+            - -c
+            - |
+              cat /data/extra-hosts >> /etc/hosts
+              cat /data/extra-hosts1 >> /etc/hosts
+              #while true; do sleep 3600; done
+              exec "/kaazing-gateway/bin/gateway.start"
+          ports:
+            - hostPort: 8001
+              containerPort: 8001
+              protocol: TCP
+            - hostPort: 9001
+              containerPort: 9001
+              protocol: TCP
+          volumeMounts:
+            - name: shared-data
+              mountPath: /data
+            - name: kaazing-config
+              mountPath: "/kaazing-gateway/conf"
+            - name: kaazing-log
+              mountPath: "/kaazing-gateway/log"
+            - name: kaazing-certs
+              mountPath: "/etc/secret"
+          securityContext:
+            runAsUser: 0  # Needed to allow modifying /etc/hosts
+      restartPolicy: Always
+      #nodeSelector:
+      #  kubernetes.io/hostname: node1
+      #hostAliases:
+      #- ip: "192.168.134.114"
+      #  hostnames:
+      #  - "leonpc.asuscomm.com"
