@@ -1,0 +1,17 @@
+sync:
+  nodes:
+    enabled: true
+    selector:
+      all: true
+  persistentvolumes:
+    enabled: true
+  persistentvolumeclaims:
+    enabled: true
+  configmaps:
+    enabled: true
+  secrets:
+    enabled: true
+  endpoints:
+    enabled: true
+  services:
+    enabled: true
