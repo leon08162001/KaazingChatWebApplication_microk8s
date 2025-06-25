@@ -145,26 +145,26 @@ $env:Path += ";" + $Env:APPDATA + "\vcluster";
 [Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::User);
 
 #為 vcluster 建立命名空間
-kubectl create namespace vcluster
+kubectl create namespace leon0816
 
 #建立 vcluster
-vcluster create leon0816 -n vcluster --connect=false -f vcluster.yml
+vcluster create leon0816 -n leon0816 --connect=false -f vcluster.yml
 
 #檢查 vcluster 狀態
-kubectl get pods -n default
+kubectl get pods -n leon0816
 
 #連接到 vcluster
-vcluster connect leon0816 -n default
+vcluster connect leon0816 -n leon0816
 
 #切換回主cluster
 kubectl config use-context microk8s
 
 #切換回vcluster
-vcluster connect leon0816 -n default
+vcluster connect leon0816 -n leon0816
 
 #Delete a vcluster
-vcluster delete leon0816 -n vcluster
-kubectl delete ns vcluster
+vcluster delete leon0816 -n leon0816
+kubectl delete ns leon0816
 
 #Get All vClusters
 kubectl get deployments --all-namespaces -l app=vcluster
