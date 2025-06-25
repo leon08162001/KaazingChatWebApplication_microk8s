@@ -50,6 +50,12 @@ kubectl exec -it -n pihole pihole-84bcc846c-wqldv -c pihole -- /bin/sh
 
 kubectl exec -it kaazingchatapi-deployment-69ccf4579c-zk7lw -c kaazingchatapi -- powershell
 
+#windows node 設定汙點
+kubectl taint nodes win-node1 os=windows:NoSchedule
+
+#強制刪除pod
+kubectl delete pod myweb-deployment-f77d5c747-l8md5 -n myweb --grace-period=0 --force
+
 #檢查pod錯誤
 kubectl describe pod sqlserver-6c4597c7b9-z482k
 
@@ -59,8 +65,24 @@ kubectl delete pod <pod-name> -n <namespace> --grace-period=0 --force
 #切換到指定命名空間
 kubectl config set-context --current --namespace=home
 
+#連線到某個 Pod 上的 HTTP 服務
+kubectl port-forward svc/lens-metrics 9090:80 -n default
+
 #传输文件
 multipass transfer "D:\Kompose convert\kaazing-websocket\gateway-config.xml" microk8s-vm:/kaazing-gateway/conf/gateway-config.xml
+multipass transfer "D:\Kompose convert\microk8s-sh\microk8s cluster backup\microk8s_backup.sh" microk8s-vm:/home/ubuntu/
+
+#使檔案可執行並執行它
+multipass exec microk8s-vm -- chmod +x /home/ubuntu/microk8s_backup.sh
+multipass exec microk8s-vm -- sudo /home/ubuntu/microk8s_backup.sh
+
+multipass exec microk8s-vm -- chmod +x /home/ubuntu/microk8s_restore.sh
+multipass exec microk8s-vm -- sudo /home/ubuntu//microk8s_restore.sh /var/backups/microk8s/XXX.tar.gz
+
+# Fix line endings (optional but recommended)
+multipass exec microk8s-vm -- sudo apt update
+multipass exec microk8s-vm -- sudo apt install dos2unix -y
+multipass exec microk8s-vm -- dos2unix /home/ubuntu/microk8s_backup.sh
 
 #檢查該命名空間的事件log追查錯誤
 kubectl get events -n kaazing-gateway --sort-by='.lastTimestamp'
@@ -80,3 +102,72 @@ kubectl get pods -o wide --all-namespaces --sort-by=.metadata.namespace
 
 #顯示所有狀態異常的 Pods
 kubectl get pods --all-namespaces --field-selector=status.phase!=Running,status.phase!=Succeeded
+
+#Initialize with etcd instead of default dqlite
+sudo microk8s install --datastore=etcd
+
+
+
+
+手動重新生成（建議用於 Windows 節點或 SAN 編輯）
+如果您正在為 Windows 節點使用 kubelet 證書或需要自訂 SAN，請遵循以下方法：
+
+修改 csr.conf.template，確保包含所需的 SAN。
+
+手動重新產生憑證：
+openssl genrsa -out kubelet.key 2048
+
+openssl req -new -key kubelet.key -out kubelet.csr -config csr.conf.template
+
+openssl x509 -req -in kubelet.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out kubelet.crt -days 365 -extensions v3_req -extfile csr.conf.template
+
+[ v3_req ]
+subjectAltName = @alt_names
+
+
+替換 existing 和 on the Windows 節點（或 Linux 節點，如果相關）。kubelet.crt,kubelet.key
+
+重新啟動或整個節點以應用更改。kubelet
+
+
+
+
+#vcluster begin
+
+#安裝 vcluster CLI
+curl -sSL https://vcluster.com/downloads/latest/vcluster-linux-amd64 -o vcluster
+chmod +x vcluster
+sudo mv vcluster /usr/local/bin/
+
+md -Force "$Env:APPDATA\vcluster"; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]'Tls,Tls11,Tls12';
+Invoke-WebRequest -URI "https://github.com/loft-sh/vcluster/releases/latest/download/vcluster-windows-amd64.exe" -o $Env:APPDATA\vcluster\vcluster.exe;
+$env:Path += ";" + $Env:APPDATA + "\vcluster";
+[Environment]::SetEnvironmentVariable("Path", $env:Path, [System.EnvironmentVariableTarget]::User);
+
+#為 vcluster 建立命名空間
+kubectl create namespace vcluster
+
+#建立 vcluster
+vcluster create leon0816 -n vcluster --connect=false -f vcluster.yml
+
+#檢查 vcluster 狀態
+kubectl get pods -n default
+
+#連接到 vcluster
+vcluster connect leon0816 -n default
+
+#切換回主cluster
+kubectl config use-context microk8s
+
+#切換回vcluster
+vcluster connect leon0816 -n default
+
+#Delete a vcluster
+vcluster delete leon0816 -n default
+kubectl delete ns default
+
+#轉換舊格式設定檔
+vcluster convert config --distro k8s -f vcluster-values.yml > vcluster.yml
+
+
+#vcluster end
