@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: kaazingchatapi-gatewaypod
+  name: kaazingchatapi-gatewaypod-deployment
+  namespace: kaazingchatapi
+  annotations:
+    linkerd.io/inject: enabled
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kaazingchatapi-gatewaypod
+  template:
+    metadata:
+      labels:
+        app: kaazingchatapi-gatewaypod
+    spec:
+      containers:
+        - name: socat
+          image: alpine/socat
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              socat TCP-LISTEN:8080,fork,reuseaddr TCP:kaazingchatapi-internal-service.kaazingchatapi.svc.cluster.local:8080 &
+              socat TCP-LISTEN:8081,fork,reuseaddr TCP:kaazingchatapi-internal-service.kaazingchatapi.svc.cluster.local:8081 &
+              socat TCP-LISTEN:8172,fork,reuseaddr TCP:kaazingchatapi-internal-service.kaazingchatapi.svc.cluster.local:8172 &
+              tail -f /dev/null
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+            - containerPort: 8081
+              protocol: TCP
+            - containerPort: 8172
+              protocol: TCP

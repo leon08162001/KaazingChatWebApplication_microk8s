@@ -1,0 +1,5 @@
+10.1.254.66     websocketserver1.asuscomm.com
+
+TARGET_POD_IP=$(kubectl get pods -l io.kompose.service=tibcoems -o jsonpath='{.items[0].status.podIP}')
+              TARGET_POD_NAME=$(kubectl get pods -l io.kompose.service=tibcoems -o jsonpath='{.items[0].metadata.name}')
+

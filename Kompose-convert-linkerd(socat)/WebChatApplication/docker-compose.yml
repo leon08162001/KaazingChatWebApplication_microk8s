@@ -1,0 +1,16 @@
+version: '3.0'
+services:
+  myweb:
+    build:
+      context: ./WebChatApplication
+      dockerfile: Dockerfile
+    image: myiis
+    container_name: chatwebapplication
+    platform: windows
+    isolation: hyperv
+    environment:
+      - TZ=Asia/Taipei
+    restart: always
+    ports:
+      - '80:80'
+      - '1443:1443'

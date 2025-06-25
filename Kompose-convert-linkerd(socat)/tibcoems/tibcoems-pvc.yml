@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tibcoems-config
+  namespace: tibcoems
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+  #storageClassName: microk8s-hostpath
+  volumeName: tibcoems-config
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tibcoems-certs
+  namespace: tibcoems
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+  #storageClassName: microk8s-hostpath
+  volumeName: tibcoems-certs

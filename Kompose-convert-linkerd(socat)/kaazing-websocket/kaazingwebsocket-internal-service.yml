@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    svc: kaazingwebsocket-internal-service
+  name: kaazingwebsocket-internal-service
+  namespace: kaazingwebsocket
+spec:
+  type: ClusterIP
+  ports:
+    - name: kaazingwebsocket-tcp
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
+    - name: kaazingwebsocket-ssl
+      port: 9001
+      protocol: TCP
+      targetPort: 9001
+  selector:
+     app: kaazingwebsocket
+  sessionAffinity: None
