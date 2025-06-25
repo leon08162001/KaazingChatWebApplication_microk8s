@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kaazingchatwebapplication-myweb
+  namespace: myweb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  #storageClassName: microk8s-hostpath
+  volumeName: kaazingchatwebapplication-myweb
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pushnotificationwebap-myweb
+  namespace: myweb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  #storageClassName: microk8s-hostpath
+  volumeName: pushnotificationwebap-myweb
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: taipeistarbankmessageclientwebapi-myweb
+  namespace: myweb
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
+  #storageClassName: microk8s-hostpath
+  volumeName: taipeistarbankmessageclientwebapi-myweb
+
+
