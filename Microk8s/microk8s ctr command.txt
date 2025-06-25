@@ -163,8 +163,8 @@ kubectl config use-context microk8s
 vcluster connect leon0816 -n default
 
 #Delete a vcluster
-vcluster delete leon0816 -n default
-kubectl delete ns default
+vcluster delete leon0816 -n vcluster
+kubectl delete ns vcluster
 
 #Get All vClusters
 kubectl get deployments --all-namespaces -l app=vcluster
