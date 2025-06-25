@@ -166,6 +166,9 @@ vcluster connect leon0816 -n default
 vcluster delete leon0816 -n default
 kubectl delete ns default
 
+#Get All vClusters
+kubectl get deployments --all-namespaces -l app=vcluster
+
 #轉換舊格式設定檔
 vcluster convert config --distro k8s -f vcluster-values.yml > vcluster.yml
 
