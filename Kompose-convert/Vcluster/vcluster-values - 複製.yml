@@ -1,3 +1,6 @@
+syncer:
+  extraArgs:
+  - --tls-san=192.168.134.220
 sync:
   nodes:
     enabled: true
