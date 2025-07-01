@@ -9,7 +9,7 @@ spec:
   resources:
     requests:
       storage: 50Mi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: tibcoems-config
 
 ---
@@ -25,5 +25,5 @@ spec:
   resources:
     requests:
       storage: 50Mi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: tibcoems-certs
