@@ -9,7 +9,7 @@ spec:
   resources:
     requests:
       storage: 200Mi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: kaazingchatapi-website
 
 ---
@@ -25,7 +25,7 @@ spec:
   resources:
     requests:
       storage: 10Gi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: kaazingchatapi-videostream
 
 ---
@@ -41,7 +41,7 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: kaazingchatapi-faillog
 
 ---
@@ -57,6 +57,6 @@ spec:
   resources:
     requests:
       storage: 100Mi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: kaazingchatapi-iislog
 

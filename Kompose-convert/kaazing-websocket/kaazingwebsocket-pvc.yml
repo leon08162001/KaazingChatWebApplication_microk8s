@@ -9,7 +9,7 @@ spec:
   resources:
     requests:
       storage: 50Mi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: kaazing-config
 
 ---
@@ -25,7 +25,7 @@ spec:
   resources:
     requests:
       storage: 200Mi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: kaazing-log
 
 ---
@@ -41,5 +41,5 @@ spec:
   resources:
     requests:
       storage: 50Mi
-  #storageClassName: microk8s-hostpath
+  storageClassName: microk8s-hostpath
   volumeName: kaazing-certs

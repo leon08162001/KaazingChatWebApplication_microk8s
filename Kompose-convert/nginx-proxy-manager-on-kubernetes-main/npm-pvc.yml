@@ -9,8 +9,8 @@ spec:
   resources:
     requests:
       storage: 5Gi
-  #storageClassName: microk8s-hostpath
-  #volumeName: npm-data
+  storageClassName: microk8s-hostpath
+  volumeName: npm-data
 
 ---
 
@@ -25,5 +25,5 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  #storageClassName: microk8s-hostpath
-  #volumeName: npm-letsencrypt
+  storageClassName: microk8s-hostpath
+  volumeName: npm-letsencrypt
