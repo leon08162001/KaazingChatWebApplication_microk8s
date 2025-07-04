@@ -1,11 +1,9 @@
 syncer:
   extraArgs:
-  - --tls-san=192.168.134.220
+  - --tls-san=192.168.134.220,vcluster.asuscomm.com
 sync:
   nodes:
     enabled: true
-    selector:
-      all: true
   persistentvolumes:
     enabled: true
   persistentvolumeclaims:
