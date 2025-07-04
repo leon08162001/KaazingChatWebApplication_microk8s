@@ -10,7 +10,7 @@ metadata:
   name: kaazingwebsocket-deployment
   namespace: kaazingwebsocket
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: kaazingwebsocket
@@ -55,8 +55,10 @@ spec:
             - |
               POD_IP=$(hostname -i)
               echo "$POD_IP websocketserver1.asuscomm.com" > /data/extra-hosts
-              TARGET_POD_IP=$(kubectl get pods -n tibcoems -l app=tibcoems -o jsonpath='{.items[0].status.podIP}')
-              TARGET_POD_NAME=$(kubectl get pods -n tibcoems -l app=tibcoems -o jsonpath='{.items[0].metadata.name}')
+              TARGET_POD_IP=$(kubectl get pods -n tibcoems -l app=tibcoems -o jsonpath="{.items[0].status.podIP}")             
+              TARGET_POD_NAME=$(kubectl get pods -n tibcoems -l app=tibcoems -o jsonpath="{.items[0].metadata.name}")
+              #TARGET_POD_IP=$(kubectl get pods -n leon0816 -l app=tibcoems -o jsonpath="{.items[0].status.podIP}")
+              #TARGET_POD_NAME=$(kubectl get pods -n leon0816 -l app=tibcoems -o jsonpath="{.items[0].metadata.annotations['vcluster\.loft\.sh/name']}")
               echo "$TARGET_POD_IP $TARGET_POD_NAME" > /data/extra-hosts1
           volumeMounts:
             - name: shared-data
