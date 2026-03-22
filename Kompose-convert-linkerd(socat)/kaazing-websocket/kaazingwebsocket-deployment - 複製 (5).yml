@@ -47,34 +47,6 @@ spec:
           - name: ndots
             value: "2"
       initContainers:
-        - name: wait-for-tibcoems
-          image: busybox
-          command:
-            - sh
-            - -c
-            - |
-              DOMAIN="tibcoems.asuscomm.com"
-              PORT=7243
-
-              echo "Using Pi-hole DNS at 192.168.134.205"
-              echo "Waiting for DNS resolve: $DOMAIN ..."
-
-              # 等待 Pi-hole DNS 可以解析
-              until nslookup $DOMAIN >/dev/null 2>&1; do
-                echo "DNS for $DOMAIN not ready (Pi-hole), retrying..."
-                sleep 2
-              done
-
-              echo "DNS resolved via Pi-hole. Testing connectivity to $DOMAIN:$PORT..."
-
-              # 等待外部 EMS 服務可連線
-              until nc -z $DOMAIN $PORT; do
-                echo "Service $DOMAIN:$PORT not reachable yet, retrying..."
-                sleep 2
-              done
-
-              echo "EMS service ready: $DOMAIN:$PORT"
-
         - name: init-hosts
           image: bitnami/kubectl:latest
           command:
