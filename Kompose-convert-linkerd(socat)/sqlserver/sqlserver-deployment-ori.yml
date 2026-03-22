@@ -26,21 +26,15 @@ spec:
     spec:
       securityContext:
         fsGroup: 10001
-        runAsUser: 0
       containers:
         - env:
-             - name: ACCEPT_EULA
-               value: "Y"
-             - name: MSSQL_ENABLE_HADR
-               value: "1"
-             - name: MSSQL_AGENT_ENABLED
-               value: "1"
-             - name: MSSQL_SA_PASSWORD
-               value: 1qaz!QAZ
-             - name: TZ
-               value: "Asia/Taipei"
+            - name: ACCEPT_EULA
+              value: "Y"
+            - name: SA_PASSWORD
+              value: "1qaz!QAZ"
           image: mcr.microsoft.com/mssql/server:2022-latest
           name: sql-server
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 1433
               protocol: TCP
@@ -59,14 +53,14 @@ spec:
       restartPolicy: Always
       volumes:
         - name: data
-          persistentVolumeClaim:
-            claimName: mssql-data
+          hostPath:
+            path: /shared/volumes/mssql/data
         - name: log
-          persistentVolumeClaim:
-            claimName: mssql-log
+          hostPath:
+            path: /shared/volumes/mssql/log
         - name: secrets
-          persistentVolumeClaim:
-            claimName: mssql-secrets
+          hostPath:
+            path: /shared/volumes/mssql/secrets
         - name: backup
-          persistentVolumeClaim:
-            claimName: mssql-backup
+          hostPath:
+            path: /shared/volumes/mssql/backup

@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: npm
 
 resources:
-- namespace.yml
-- pv.yml
-- pvc.yml
-- deployment.yml
-- service.yml
+- npm-namespace.yml
+- npm-pv.yml
+- npm-pvc.yml
+- npm-deployment.yml
+- npm-service.yml

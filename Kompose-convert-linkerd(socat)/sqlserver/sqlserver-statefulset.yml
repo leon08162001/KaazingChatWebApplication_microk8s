@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    kompose.cmd: C:\Windows\system32\kompose.exe --file docker-compose.yml convert
+    kompose.version: 1.36.0 (ae2a39403)
+    linkerd.io/inject: enabled
+  labels:
+    app: sqlserver
+  name: sqlserver-statefulset
+  namespace: sqlserver
+spec:
+  serviceName: "sqlserver"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlserver
+  template:
+    metadata:
+      labels:
+        app: sqlserver
+    spec:
+      securityContext:
+        fsGroup: 10001
+        runAsUser: 0
+      containers:
+      - name: sql-server
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+        - containerPort: 1433
+          name: tcpsql
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: MSSQL_ENABLE_HADR
+          value: "1"
+        - name: MSSQL_AGENT_ENABLED
+          value: "1"
+        - name: SA_PASSWORD
+          value: "1qaz!QAZ"
+        - name: TZ
+          value: "Asia/Taipei"
+        volumeMounts:
+        - name: data
+          mountPath: /var/opt/mssql/data
+        - name: log
+          mountPath: /var/opt/mssql/log
+        - name: secrets
+          mountPath: /var/opt/mssql/secrets
+        - name: backup
+          mountPath: /var/opt/mssql/backup
+      restartPolicy: Always
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: mssql-data
+        - name: log
+          persistentVolumeClaim:
+            claimName: mssql-log
+        - name: secrets
+          persistentVolumeClaim:
+            claimName: mssql-secrets
+        - name: backup
+          persistentVolumeClaim:
+            claimName: mssql-backup

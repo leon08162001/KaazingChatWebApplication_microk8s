@@ -56,14 +56,14 @@ spec:
       restartPolicy: Always
       volumes:
         - name: data
-          hostPath:
-            path: /shared/volumes/mssql/data
+          persistentVolumeClaim:
+            claimName: mssql-data
         - name: log
-          hostPath:
-            path: /shared/volumes/mssql/log
+          persistentVolumeClaim:
+            claimName: mssql-log
         - name: secrets
-          hostPath:
-            path: /shared/volumes/mssql/secrets
+          persistentVolumeClaim:
+            claimName: mssql-secrets
         - name: backup
-          hostPath:
-            path: /shared/volumes/mssql/backup
+          persistentVolumeClaim:
+            claimName: mssql-backup
