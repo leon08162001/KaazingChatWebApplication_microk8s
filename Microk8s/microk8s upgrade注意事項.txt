@@ -1,0 +1,95 @@
+microk8s 升級後 需手動升級的組件
+
+dqlite			不需要
+containerd		不需要
+runc			不需要
+Calico			需要
+
+
+linkerd			需要disable
+openfaas		需要disable
+community		不需要disable
+dns			需要disable
+ha-cluster		不需要disable
+helm			需要disable
+helm3			需要disable
+hostpath-storage	不需要disable,除非有錯,因為disable 會刪除資料
+metallb			需要disable
+metrics-server		需要disable
+rbac			不需要disable
+storage			不需要disable
+dashboard		需要disable
+
+
+
+
+如何在 Microk8s 的 Windows Node 中進行 Calico 升級
+在 MicroK8s 中升級 Windows 節點上的 Calico 是一個手動過程，因為一般 MicroK8s 升級不會自動更新工作節點的 CNI.這包括更新 Calico 安裝腳本，並在控制平面重新套用清單，接著在 Windows 節點上重新執行安裝。 
+先決條件
+一個混合型 MicroK8s 叢集（Linux 控制平面，Windows 工作型）。
+管理權限同時存取 Linux 控制平面與 Windows 節點。
+microk8s kubectlLinux 控制平面上的指令存取權限。 
+升級步驟
+1. 準備 Linux 控制平面
+在其中一個 Linux 控制平面節點上：
+備份現有的三花貓清單：
+砰
+cp /var/snap/microk8s/current/args/cni-network/cni.yaml /var/snap/microk8s/current/args/cni-network/cni.yaml.backup
+請謹慎使用程式碼。
+
+複製新的三花貓貨單：目標版本的新清單會在 MicroK8s 升級後（如果你也升級了 MicroK8s）後的 snap 目錄中。
+砰
+cp /snap/microk8s/current/upgrade-scripts/000-switch-to-calico/resources/calico.yaml /var/snap/microk8s/current/args/cni-network/cni.yaml
+請謹慎使用程式碼。
+
+應用新的Calico清單：
+砰
+microk8s kubectl apply -f /var/snap/microk8s/current/args/cni-network/cni.yaml
+請謹慎使用程式碼。
+
+驗證 Calico Pods（Linux）：注意命名空間中的 pod 是否會重新啟動，並依版本而定，變成 1/1 或 2/2 ready 容器。calico-nodekube-systemRunning
+砰
+microk8s kubectl get pods -n kube-system -o wide
+請謹慎使用程式碼。
+
+ 
+2. 準備 Windows 節點
+這部分是手動的，且針對初始設定時使用的 PowerShell 腳本。 
+確定新的三花斑版本：在 Linux 節點上檢查你剛套用的檔案中的圖片標籤，找出想要的 Calico 版本（例如 ）。calico.yamlv3.x.x
+下載新的 Calico 安裝腳本：在 Windows 節點上，下載對應的腳本install-calico-windows.ps1新來自Calico GitHub 發布頁面.
+停止現有的Calico服務：
+PowerShell
+Stop-Service CalicoFelix
+Stop-Service CalicoNode
+請謹慎使用程式碼。
+
+重新執行安裝/設定腳本：執行新劇本。如果被要求或使用特定設定，可能需要指定 Kubernetes 版本。
+開始 Calico 服務：
+PowerShell
+C:\calicowindows\start-calico.ps1
+請謹慎使用程式碼。
+
+ 
+3. 驗證升級
+在 Linux 控制平面上，監控 Windows 節點 Calico 服務的狀態：
+砰
+microk8s kubectl logs -f -n kube-system -l k8s-app=calico-node-windows -c felix
+microk8s kubectl logs -f -n kube-system -l k8s-app=calico-node-windows -c node
+請謹慎使用程式碼。
+
+這些膠囊最終應該會處於 a 和 狀態（例如 2/2）。calico-node-windowsRunningReady
+確認叢集中的節點狀態：
+砰
+microk8s kubectl get nodes
+請謹慎使用程式碼。
+
+請用以下方法驗證 Calico 的版本號（你可能需要在 Linux 電腦上安裝新版本）：calicoctlcalicoctl
+砰
+# Install the new calicoctl (set CALICO_VERSION first)
+curl -L github.com<NEW_CALICO_VERSION>/calicoctl-linux-amd64 -o calicoctl
+chmod +x ./calicoctl
+./calicoctl version
+請謹慎使用程式碼。
+
+叢集版本應該會和新版本相符。 
+這種手動方法確保 Windows 節點所需的特定設定能正確重新套用。

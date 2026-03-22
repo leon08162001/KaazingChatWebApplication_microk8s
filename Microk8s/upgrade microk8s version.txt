@@ -1,0 +1,17 @@
+#1.封鎖節點，並將所有正在運行的 Pod 逐出到其他節點
+kubectl drain microk8s-vm --ignore-daemonsets --delete-emptydir-data --force
+
+kubectl drain microk8s-vm --ignore-daemonsets --delete-emptydir-data --force --grace-period=30 --chunk-size=500
+
+
+kubectl get pdb --all-namespaces -o custom-columns='NAMESPACE:.metadata.namespace,NAME:.metadata.name' --no-headers | while read ns name; do kubectl delete pdb "$name" -n "$ns" --ignore-not-found=true done
+
+#2.驗證以前運行的所有 Pod 是否已刪除，並且已在其他集群節點上部署了新 Pod
+kubectl get node
+kubectl get pods -o wide
+
+#3.刷新 MicroK8s 快照以跟蹤通道，此命令需要在該節點上運行
+sudo snap refresh microk8s --channel 1.35/stable
+
+#4.取消鎖定節點，以便集群可以開始在其上調度新的工作負載
+kubectl uncordon microk8s-vm

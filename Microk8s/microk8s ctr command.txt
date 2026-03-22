@@ -12,6 +12,14 @@ microk8s images import /shared/DockerSave/pihole.tar
 
 microk8s images remove docker.io/pihole/pihole:2025.02.6
 
+ctr -n k8s.io images rm "docker.io/library/kaazingchatapi:latest"
+
+ctr -n="k8s.io" image import \\tsclient\E\shared\DockerSave\kaazingchatapi.tar
+
+ctr -n k8s.io images rm "docker.io/library/myweb:latest"
+
+ctr -n="k8s.io" image import \\tsclient\E\shared\DockerSave\myweb.tar
+
 microk8s ctr -namespace="k8s.io" images ls
 
 microk8s ctr -namespace="asuscomm.com" image rm docker.io/pihole/pihole:2025.02.6
@@ -40,6 +48,8 @@ ctr -n="asuscomm.com" image rm docker.io/pihole/pihole:2025.02.6
 
 kubectl apply -f "D:\KaazingChatWebApplication_DockerCompose\linux\Kompose convert\sqlserver-deployment.yaml"
 
+kubectl delete -f sqlserver-deployment-ori.yml
+
 #改變上游之dns解析
 kubectl -n kube-system edit configmap coredns
 
@@ -56,11 +66,17 @@ kubectl taint nodes win-node1 os=windows:NoSchedule
 #強制刪除pod
 kubectl delete pod myweb-deployment-f77d5c747-l8md5 -n myweb --grace-period=0 --force
 
+#強制刪除ReplicaSet
+kubectl delete rs kaazingwebsocket-deployment-5bf9bb7ff5 -n kaazingwebsocket --grace-period=0 --force
+
 #檢查pod錯誤
 kubectl describe pod sqlserver-6c4597c7b9-z482k
 
 #強制刪除pod
 kubectl delete pod <pod-name> -n <namespace> --grace-period=0 --force
+
+#強制刪除pvc
+kubectl delete pvc <pvc-name> -n <namespace> --grace-period=0 --force
 
 #切換到指定命名空間
 kubectl config set-context --current --namespace=home
@@ -155,6 +171,7 @@ kubectl get pods -n leon0816
 
 #連接到 vcluster
 vcluster connect leon0816 -n leon0816
+vcluster connect leon0816 -n leon0816 --server=https://192.168.134.230
 
 #切換回主cluster
 kubectl config use-context microk8s
@@ -168,6 +185,10 @@ kubectl delete ns leon0816
 
 #Get All vClusters
 kubectl get deployments --all-namespaces -l app=vcluster
+
+#產生vcluster 使用者連線設定檔案
+vcluster connect leon0816 -n leon0816 --update-current=false --kube-config "D:\Kompose-convert-linkerd(socat)\Vcluster\kubeconfig-leon0816.yaml"
+kubectl --kubeconfig="D:\Kompose-convert-linkerd(socat)\Vcluster\kubeconfig-leon0816.yaml" get nodes
 
 #轉換舊格式設定檔
 vcluster convert config --distro k8s -f vcluster-values.yml > vcluster.yml

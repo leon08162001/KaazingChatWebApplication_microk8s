@@ -1,0 +1,12 @@
+# 1. 僅 disable 有必要的 addons
+microk8s disable metallb linkerd openfaas
+
+# 2. 升級 MicroK8s
+sudo snap refresh microk8s --channel=1.33/stable
+
+# 3. 重新 enable
+microk8s enable metallb
+microk8s enable linkerd
+microk8s enable openfaas
+
+kubectl drain node2 --ignore-daemonsets --delete-emptydir-data --force --grace-period=30 --chunk-size=500
