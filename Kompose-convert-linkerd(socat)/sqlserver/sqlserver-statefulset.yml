@@ -22,7 +22,8 @@ spec:
     spec:
       securityContext:
         fsGroup: 10001
-        runAsUser: 0
+        runAsUser: 777
+        runAsNonRoot: true
       containers:
       - name: sql-server
         image: mcr.microsoft.com/mssql/server:2022-latest

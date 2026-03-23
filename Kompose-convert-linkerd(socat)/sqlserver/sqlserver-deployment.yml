@@ -26,7 +26,8 @@ spec:
     spec:
       securityContext:
         fsGroup: 10001
-        runAsUser: 0
+        runAsUser: 777
+        runAsNonRoot: true
       containers:
         - env:
              - name: ACCEPT_EULA
